@@ -1,0 +1,63 @@
+<project basedir="." default="build" name="Project1PA">
+    <property environment="env"/>
+
+
+    <property name="one-jar.dist.dir" value="../onejar"/>
+    <import file="${one-jar.dist.dir}/one-jar-ant-task.xml" optional="true" />
+
+    <property name="src.dir"          value="src"/>
+    <property name="bin.dir"          value="bin"/>
+    <property name="build.dir"        value="build"/>
+    <property name="classes.dir"      value="${build.dir}/classes"/>
+    <property name="jar.target.dir"   value="${build.dir}/jars"/>
+    <property name="external.lib.dir" value="../jars"/>
+    <property name="final.jar"        value="${bin.dir}/boxingProfiler.jar"/>
+
+    <property name="main.class"       value="MethodFinder"/>
+
+    <path id="project.classpath">
+        <fileset dir="${external.lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="init">
+        <mkdir dir="${bin.dir}"/>
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${jar.target.dir}"/>
+        <copy includeemptydirs="false" todir="${classes.dir}">
+            <fileset dir="${src.dir}">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${bin.dir}"/>
+    </target>
+
+    <target name="cleanall" depends="clean"/>
+
+    <target name="build" depends="init">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" destdir="${classes.dir}" >
+            <src path="${src.dir}"/>
+            <classpath refid="project.classpath"/>
+        </javac>
+    </target>
+
+    <target name="build-jar" depends="build">
+        <delete file="${final.jar}" />
+        <one-jar destfile="${final.jar}" onejarmainclass="${main.class}">
+            <main>
+                <fileset dir="${classes.dir}"/>
+            </main>
+            <lib>
+                <fileset dir="${external.lib.dir}" />
+            </lib>
+        </one-jar>
+    </target>
+</project>
